@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "mamba-tiktok-brand-presence-mapper": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@mambalabsdev/mcp-tiktok-brand-presence-mapper"
+      ],
+      "env": {
+        "APIFY_TOKEN": "your-apify-token"
+      }
+    }
+  }
+}
