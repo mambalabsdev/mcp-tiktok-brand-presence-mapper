@@ -1,0 +1,86 @@
+{
+  "_provenance": {
+    "actorId": "fco8FvoJcSafbeyd1",
+    "buildId": "JXNXlsREv9dV4F5T4",
+    "buildNumber": "0.1.6",
+    "readAt": "2026-10-05T15:44:56.788Z"
+  },
+  "title": "TikTok Brand Presence Mapper - Followers for Clay Input",
+  "description": "Give a TikTok handle, or a company domain and the actor will find the handle. Returns follower, following, likes and video counts plus verification status. Free Apify plan users get 800 results per calendar month, reset monthly. Upgrade to any paid Apify plan for unlimited use: https://apify.com/pricing?fpr=mamba",
+  "type": "object",
+  "schemaVersion": 1,
+  "properties": {
+    "handle": {
+      "title": "TikTok Handle",
+      "type": "string",
+      "description": "The TikTok handle, with or without the leading @, for example shopify. This is the PRIMARY input: only 4 of 14 B2B homepages declare a TikTok link, so supplying the handle is both cheaper and far more reliable than asking the actor to find it.",
+      "editor": "textfield",
+      "prefill": "shopify"
+    },
+    "company_domain": {
+      "title": "Company Domain",
+      "type": "string",
+      "description": "Bare company domain, for example shopify.com. Used to FIND the handle when you do not have one, and to identity check a handle that discovery guessed. Supplying both is the best case.",
+      "editor": "textfield",
+      "prefill": ""
+    },
+    "company_name": {
+      "title": "Company Name",
+      "type": "string",
+      "description": "Optional. Improves search accuracy and is what the identity gate checks a discovered account against.",
+      "editor": "textfield",
+      "prefill": ""
+    },
+    "includeFollowerCounts": {
+      "title": "Include Follower Counts",
+      "type": "string",
+      "description": "When \"true\" (default) the profile page is fetched and the counts are extracted. Set \"false\" to resolve the profile URL only, which is cheaper and needs no proxy. Sent as a string for Clay compatibility.",
+      "editor": "select",
+      "enum": [
+        "true",
+        "false"
+      ],
+      "enumTitles": [
+        "true (URL plus follower counts)",
+        "false (URL only, cheaper)"
+      ],
+      "default": "true"
+    },
+    "skipCache": {
+      "title": "Skip Cache",
+      "type": "string",
+      "description": "When \"false\" (default) a successful lookup is cached for seven days and reused. Set \"true\" to force a fresh fetch. Sent as a string for Clay compatibility.",
+      "editor": "select",
+      "enum": [
+        "false",
+        "true"
+      ],
+      "enumTitles": [
+        "false (use cache)",
+        "true (force fresh)"
+      ],
+      "default": "false"
+    },
+    "escalateOnBlock": {
+      "title": "Retry Blocked Fetches on Residential",
+      "type": "string",
+      "description": "TikTok answers most requests over cheap datacenter routing and blocks a minority with a bot detection page. When \"true\" (default) a blocked fetch is retried once over residential, which recovers most of them at a higher cost per recovered row. Set \"false\" to accept the block and return status blocked. Sent as a string for Clay compatibility.",
+      "editor": "select",
+      "enum": [
+        "true",
+        "false"
+      ],
+      "enumTitles": [
+        "true (retry blocked fetches, higher coverage)",
+        "false (accept the block, lowest cost)"
+      ],
+      "default": "true"
+    },
+    "source_tag": {
+      "title": "Source Tag",
+      "type": "string",
+      "description": "Internal attribution tag set by Mamba Labs on published task examples. Not required, and nothing depends on it. Leave it empty.",
+      "editor": "textfield"
+    }
+  }
+}
