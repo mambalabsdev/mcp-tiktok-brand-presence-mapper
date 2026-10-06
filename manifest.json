@@ -1,7 +1,7 @@
 {
   "manifest_version": "0.3",
   "name": "mcp-tiktok-brand-presence-mapper",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "MCP server that resolve a TikTok handle or a company domain to the brand account with follower, like and video counts.",
   "author": {
     "name": "Mamba Labs"
