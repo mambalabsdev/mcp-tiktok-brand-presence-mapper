@@ -6,6 +6,16 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
 
+// Optional per call spending cap, passed through to the actor's own max_charge_usd
+// input. The actor enforces it; this wrapper only forwards it when set.
+const MAX_CHARGE_USD = z
+  .number()
+  .min(0)
+  .optional()
+  .describe(
+    "Optional spending cap for this call, in USD, passed to the actor as max_charge_usd. The run stops before any charge that would take it past this amount and keeps every row already charged. Leave empty to rely only on the maximum charge per run set on your Apify account.",
+  );
+
 const here = dirname(fileURLToPath(import.meta.url));
 const pkg = JSON.parse(
   readFileSync(join(here, "..", "package.json"), "utf8"),
@@ -77,7 +87,9 @@ async function runActor(
   actorPath: string,
   actorLabel: string,
   input: Record<string, unknown>,
+  maxChargeUsd?: number,
 ): Promise<ToolResult> {
+  if (maxChargeUsd !== undefined) input = { ...input, max_charge_usd: maxChargeUsd };
   const APIFY_TOKEN = process.env.APIFY_TOKEN;
   if (!APIFY_TOKEN) {
     return { isError: true, content: [{ type: "text", text: "APIFY_TOKEN is not set. Create a token at https://console.apify.com/account/integrations and set it as the APIFY_TOKEN environment variable." }] };
@@ -218,7 +230,7 @@ server.registerTool(
       "Resolve a TikTok handle, or a company domain, to that brand's official TikTok account. Returns follower, following, like and video counts, verification status, display name, bio and the account's outbound bio link, as one flat Clay ready row. Counts above roughly ten thousand are rounded by TikTok and the row flags that. A guessed account that fails the identity check is reported as identity_mismatch with no counts rather than being returned as the company's, and a brand with no TikTok account reports tiktok_status not_found. Read tiktok_status before any count. Use it to look up one known brand per call; it does not search TikTok, list or read videos, or compare accounts, so pair it with the sibling presence mappers for other platforms. Read only; requires an APIFY_TOKEN and consumes Apify credits per call.",
     annotations: {
       title: "Map TikTok Brand Presence",
-      readOnlyHint: true,
+      readOnlyHint: false,
       destructiveHint: false,
       idempotentHint: true,
       openWorldHint: true,
@@ -242,9 +254,10 @@ server.registerTool(
       escalateOnBlock: z.boolean()
         .optional()
         .describe("TikTok answers most requests over cheap datacenter routing and blocks a minority with a bot detection page. When \"true\" (default) a blocked fetch is retried once over residential, which recovers most of them at a higher cost per recovered row. Set \"false\" to accept the block and return status blocked. Sent as a string for Clay compatibility."),
+      max_charge_usd: MAX_CHARGE_USD,
     },
   },
-  async ({ handle, company_domain, company_name, includeFollowerCounts, skipCache, escalateOnBlock }) => {
+  async ({ handle, company_domain, company_name, includeFollowerCounts, skipCache, escalateOnBlock, max_charge_usd }) => {
     return runActor(
       "fco8FvoJcSafbeyd1",
       "TikTok Brand Presence Mapper",
@@ -256,7 +269,7 @@ server.registerTool(
         skipCache: boolToString(skipCache),
         escalateOnBlock: boolToString(escalateOnBlock),
       }),
-    );
+     max_charge_usd,);
   },
 );
 
